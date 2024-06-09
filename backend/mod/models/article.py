@@ -19,7 +19,7 @@ class Article(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 
-    def preprocess_content(self):
+    def preprocess_content(self, text):
         """Preprocess content for the plagiarism check"""
         text = text.lower()
         text = text.translate(str.maketrans('', '', string.punctuation))
