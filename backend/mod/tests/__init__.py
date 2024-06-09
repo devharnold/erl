@@ -1,7 +1,9 @@
 import unittest
 
 def suite():
-    """Identifies all the tests in the directory and sub-directories
-    Returns a unittest.TestSuite object containing the tests
+    """Discovers all test cases within the current directory
+       and subdirectories.
+       
+       Returns a unittest.TestSuite object containing the tests
     """
-    return unittest.TestLoader().discover('.', pattern='test_*.py')
+    return unittest.TestLoader().discover('.', pattern="test*.py")

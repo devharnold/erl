@@ -2,7 +2,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from mod.models import Post, Blog
+from mod.models.blog import Blog
+from mod.models.post import Post
 
 class Notification(models.Model):
     """Notification model class"""
