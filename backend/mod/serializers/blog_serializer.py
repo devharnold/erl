@@ -11,3 +11,5 @@ class BlogSerializer(serializers.Serializer):
         if not value.strip():
             raise serializers.ValidationError("Title is blank")
         return value
+    
+    
