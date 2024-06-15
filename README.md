@@ -33,8 +33,8 @@ A social-media related tool to help users within different regions share insight
 1. **Clone the repository**
 
     ```sh
-    git clone https://github.com/yourusername/blogpost-webapp.git
-    cd blogpost-webapp/backend
+    git clone https://github.com/yourusername/erl.git
+    cd erl/backend
     ```
 
 2. **Create a virtual environment**
@@ -119,4 +119,4 @@ For any inquiries or feedback, feel free to open an issue or contact us at [henr
 
 ---
 
-Thank you for using BlogPost Web App! Happy blogging and photo sharing!
+Thank you for using erl.
