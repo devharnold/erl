@@ -12,3 +12,4 @@ class NotificationSerializer(serializers.Serializer):
         if not value.strip():
             raise serializers.ValidateError("Title of notification is empty")
         return value
+    
