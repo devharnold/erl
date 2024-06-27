@@ -1,6 +1,6 @@
-from .view_article import ArticleViewSet
-from .view_blog import BlogViewSet
-from .view_notification import NotificationListView, NotificstionUpdateView
-from .view_post import PostViewSet
+from .view_article import ArticleList, ArticleDetail
+from .view_blog import BlogList, BlogDetail
+from .view_notification import NotificationListView, NotificationUpdateView
+from .view_post import PostList, PostDetail
 
-__all__ = ['ArticleViewSet', 'BlogViewSet', 'NotificationViewSet', 'PostViewSet']
+__all__ = ['ArticleList', 'ArticleDetail', 'BlogList', 'BlogDetail', 'PostList', 'PostDetail', 'NotificationListView', 'NotificationUpdateView']
