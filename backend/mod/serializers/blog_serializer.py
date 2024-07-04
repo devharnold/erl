@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueForYearValidator
+from django.core.exceptions import ValidationError
 from mod.models import Blog
 
 class BlogSerializer(serializers.Serializer):
@@ -22,4 +24,13 @@ class BlogSerializer(serializers.Serializer):
             raise serializers.ValidationError("Blog is empty")
         return value
     
-    
+class BlogWithYear(serializers.Serializer):
+    """Blogs have a slug thats unique for the current year"""
+    class Meta:
+        validators = [
+            UniqueForYearValidator(
+                queryset=Blog.objects.all(),
+                field='slug',
+                date_field='published'
+            )
+        ]
