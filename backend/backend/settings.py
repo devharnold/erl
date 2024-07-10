@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'mod',
     'rest_framework',
     'imagefield',
+    'django_filters',
 ]
 
 MEDIA_URL = "media/"
@@ -48,7 +49,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
         'mod.permissions.permissions.IsOwnerOrReadOnly',
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication'
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 MIDDLEWARE = [

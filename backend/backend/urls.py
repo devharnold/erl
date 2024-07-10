@@ -19,6 +19,7 @@ from django.urls import path, include
 from mod.views import ArticleList, ArticleDetail, BlogList, BlogDetail, PostList, PostDetail
 from django.conf import settings
 from django.conf.urls.static import static
+from mod.views import LoginView
 
 #router = default_router()
 #router.register('article', ArticleViewSet, basename='article')
@@ -32,6 +33,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('article.urls')),
+    path('login/', LoginView.as_view(), name='login'),
     path('articles/', ArticleList.as_view(), name='article-list'),
     path('articles/<int:pk>/', ArticleDetail.as_view(), name='article-detail'),
     path('blogs/', BlogList.as_view(), name='article-list'),
