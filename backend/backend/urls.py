@@ -32,8 +32,9 @@ from mod.views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('article.urls')),
+    path('signup/', UserSignupView.as_view(), name='signup')
     path('login/', LoginView.as_view(), name='login'),
+    path('', include('article.urls')),
     path('articles/', ArticleList.as_view(), name='article-list'),
     path('articles/<int:pk>/', ArticleDetail.as_view(), name='article-detail'),
     path('blogs/', BlogList.as_view(), name='article-list'),
