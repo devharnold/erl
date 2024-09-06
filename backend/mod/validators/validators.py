@@ -41,3 +41,16 @@ class MaxImageSizeValidator:
             Tuple: A tuple containing the path to the class and its arguments
         """
         return ('MaxImageSizeValidator', [self.max_size_mb], {})
+    
+
+class ImageSizeValidator(MaxImageSizeValidator):
+    def __init__(self, max_size_mb: int) -> None:
+        super().__init__(max_size_mb)
+
+    def __call__(self, image):
+        self.validate_image_size(image)
+
+    def validate_image_size(self, image_size):
+        if image_size > self.max_size:
+            raise ValidationError(f"IMage file should not exceed  {self.max_size / (1024 * 1024)}MB.")
+        return super().validate_image_size()

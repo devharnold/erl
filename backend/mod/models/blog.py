@@ -8,6 +8,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=50)
     location = models.CharField(max_length=50)
     description = models.TextField()
+    content = models.CharField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 

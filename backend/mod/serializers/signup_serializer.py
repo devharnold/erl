@@ -15,3 +15,4 @@ class UserSignupSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return User
+    

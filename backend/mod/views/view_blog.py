@@ -1,18 +1,11 @@
 from rest_framework.views import APIView
 from mod.models import Blog
 from mod.serializers import  BlogSerializer
-from mod.permissions.permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly
+from mod.permissions.permissions import IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 
-
-#class BlogViewSet(viewsets.ReadOnlyModelViewSet):
-#    """ViewSet for { Blog }object model
-#    """
-#    queryset = Blog.objects.all().select_related('module')
-#    serializer_class = BlogSerializer
-#    permission_classes = [IsAdminOrReadOnly]
 
 class BlogList(APIView):
     """Retrieves a list of blogs
@@ -25,7 +18,7 @@ class BlogList(APIView):
 
     def get(self, request, format=None):
         blogs = Blog.objects.all()
-        serializer = BlogSerializer(blogs, many=True)
+        serializer = BlogSerializer(blogs, data=request.data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, format=None):
@@ -57,7 +50,7 @@ class BlogDetail(APIView):
     def get(self, request, pk, format=None):
         """Retrieve a blog by its primary key"""
         blog = self.get_object(pk)
-        serializer = BlogSerializer(blog)
+        serializer = BlogSerializer(blog, data=request.data)
         return Response(serializer.data)
     
     def put(self, request, pk, format=None):

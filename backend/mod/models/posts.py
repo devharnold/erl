@@ -1,39 +1,25 @@
 from django.db import models
-from django.contrib.auth.models import User
-from imagefield.fields import ImageField
-from imagefield.processing import register
+from PIL import Image
 
-class ImageModel(models.Model):
-    """Implementation of the ImageField object model"""
-    image = ImageField(
-        upload_to="images",
-        formats = {
-            "thumb": ["default", ("crop", (300, 300))],
-            "desktop": ["default", ("thumbnail", (300, 225))],
-        },
-        auto_add_fields=True,
-    )
+
 
 class Post(models.Model):
-    """
-    Posts: can be pictures and videos
-    Attr:
-        title(str): The post's title
-        post_type(str): The type of post shared by the user(
-        video, picutre)
-    """
-
-    POST_TYPES = ('picture', 'Picture')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='post/%Y/%m/%d/', null=True, max_length=225)
-    description = models.CharField(max_length=50)
+    title = models.CharField(max_length=225)
+    description = models.CharField(max_length=200)
+    image_url = models.ImageField(upload_to="posts", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        #check if image exists
+        if self.image:
+            img = Image.open(self.image.path)
+
+            max_size = (800, 800)
+            if img.height > max_size[0] or img.width > max_size[1]:
+                img.thumbnail(max_size)
+                img.save(self.image.path)
 
     def __str__(self):
-        return self.name
-    
-    class Meta:
-        app_label = 'mod'
-        ordering = ['-created_at']
+        return self.title
