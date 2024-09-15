@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from mod.views import ArticleList, ArticleDetail, BlogList, BlogDetail, PostList, PostDetail, SearchUser
+from mod.views import ArticleList, ArticleDetail, BlogList, BlogDetail, PostList, PostDetail, SearchUserView
 from django.conf import settings
 from django.conf.urls.static import static
 from mod.views import LoginView, UserSignupView
@@ -25,14 +25,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('signup/', UserSignupView.as_view(), name='signup'),
     path('login/', LoginView.as_view(), name='login'),
-    path('/search-users', SearchUser.as_view(), name='search_users'),
-    path('', include('article.urls')),
+    path('search-users/', SearchUserView.as_view(), name='search_users'),
+    #path('', include('article.urls')),
     path('articles/', ArticleList.as_view(), name='article-list'),
     path('articles/<int:pk>/', ArticleDetail.as_view(), name='article-detail'),
     path('blogs/', BlogList.as_view(), name='article-list'),
     path('blogs<int:pk>/', BlogDetail.as_view(), name='blog-list'),
     path('posts/', PostList.as_view(), name='post-list'),
-    path('posts/<int:pk', PostDetail.as_view(), name='post-detail'),
+    path('posts/<int:pk>/', PostDetail.as_view(), name='post-detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

@@ -46,7 +46,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        'rest_framework.permissions.IsAuthencticated',
+        'rest_framework.permissions.IsAuthenticated',
         'mod.permissions.permissions.IsOwnerOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [

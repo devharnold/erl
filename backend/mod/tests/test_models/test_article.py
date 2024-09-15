@@ -3,6 +3,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from mod.models.article import Article
+from django.core.exceptions import ValidationError
 
 class ArticleTestCase(TestCase):
     """Article class TestCase"""
@@ -21,7 +22,8 @@ class ArticleTestCase(TestCase):
             content='Test Content'
         )
 
-    def test_article_creation(self):
+    def test_create_article(self):
+        """Test for valid article creation"""
         article = Article.objects.get(id=1)
         self.assertEqual(article.user.username, 'testuser')
         self.assertEqual(article.title, 'Test Article')
@@ -33,6 +35,18 @@ class ArticleTestCase(TestCase):
         article = self.test_article
         max_length = self.test_article._meta.get_field('title').max_length
         self.assertEqual(max_length, 225)
+
+    def test_article_blank_title(self):
+        with self.assertRaises(ValidationError) as context:
+            article = Article.objects.create(
+            title='Test Article',
+            description='Test Description',
+            content='Test Content written for article'
+        )
+        article.full_clean()
+        self.assertIn(
+            'Title cannot be blank.', context.exception.messages
+        )
 
     def test_article_created_at_auto_now_add(self):
         article = self.test_article
@@ -53,3 +67,23 @@ class ArticleTestCase(TestCase):
         )
         articles = Article.objects.order_by('created_at')
         self.assertEqual(list(articles), [self.test_article, article_1, article_2])
+
+    def test_unique_content_per_article(self):
+        """test for unique article content"""
+        article1 = Article.objects.create(
+            title = 'Test Title',
+            description = 'Test Description',
+            content = 'Unique Content'
+        )
+        article2 = Article.objects.create(
+            title = 'Test Title2',
+            description = 'Test Description2',
+            content = 'Unique Content'
+        )
+        with self.assertRaises(ValidationError) as context:
+            article2.full_clean()
+            article2.save()
+        self.assertIn(
+            'Article with this content already exists',
+            context.exception.messages
+        )

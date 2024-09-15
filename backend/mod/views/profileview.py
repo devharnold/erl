@@ -10,13 +10,13 @@ class EditProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user # get user's data
+        user = request.User # get user's data
         serializer = EditProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def put(self, request):
         #update user's profile
-        user = request.user
+        user = request.User
         serializer = EditProfileSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

@@ -1,65 +1,92 @@
+from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import TransactionTestCase
-from rest_framework.test import APIClient
+from mod.models import Post
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
+import tempfile
+import os
 
-class PostTestAPI(TransactionTestCase):
-    """
-    Test case for Post API endpoints
-    """
-    def setUp(self):
-        """
-        Setup data for the post view tests"""
-        self.user = User.objects.create(username='testuser', password='testpass')
-        self.client = APIClient()
-        self.client.login(username='testuser', password='testpass')
+class PostModelTestCase(TestCase):
+    """Test case for the Post model."""
 
-    def test_empty_database(self):
-        """Test for empty database"""
-        response = self.client.get('/api/posts/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, [])
+    @classmethod
+    def setUpTestData(cls):
+        # Create a user for setup
+        cls.test_user = User.objects.create_user(
+            username='testuser',
+            email='email@example.com',
+            password='testpassword'
+        )
 
-    def test_single_post(self):
-        """Test for single post"""
-        post_data = {'title': 'Test Post', 'description': 'Test Description'}
-        response = self.client.post('/api/posts/', post_data, format='json')
-        self.assertEqual(response.status_code, 201)
-        post_id = response.data['id']
+        # Create a temporary image file for setup
+        cls.test_image = cls.create_test_image(size=(500, 500))
+        cls.uploaded_image_url = SimpleUploadedFile(
+            name='test_image.jpg',
+            content=cls.test_image.read(),
+            content_type='image/jpeg'
+        )
 
-        response = self.client.get('/api/posts/{ post_id }/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['title'], 'Test Post')
+        # Create a post with the uploaded image
+        cls.test_post = Post.objects.create(
+            title='Test Post',
+            description='Test Description',
+            image_url=cls.uploaded_image_url
+        )
 
-        updated_post_data = {'title': 'Updated Post', 'description': 'Updated Description'}
-        response = self.client.put(f'/api/posts/{'post_id'}', updated_post_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['title'], 'Updated Post')
+    @classmethod
+    def create_test_image(cls, size=(1000, 1000)):
+        """Creates a temporary test image."""
+        image = Image.new('RGB', size)
+        temp_image = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
+        image.save(temp_image, format='JPEG')
+        temp_image.seek(0)
+        return temp_image
 
-        response = self.client.delete(f'/api/posts/{'post_id'}')
-        self.assertEqual(response.status_code, 200)
+    def test_post_creation(self):
+        """Test to confirm if posts are successfully created."""
+        post_count_before = Post.objects.count()
+        post = Post.objects.create(
+            title='Another test post',
+            description='Another test description',
+            image_url=self.uploaded_image_url
+        )
+        post_count_after = Post.objects.count()
+        self.assertEqual(post_count_after, post_count_before + 1)
 
-    """
-    Test multiple posts, permission, validation, error_handling
-    """
+    def test_blank_image_url(self):
+        """Test creation of a post with no image."""
+        post_count_before = Post.objects.count()
+        post = Post.objects.create(
+            title='Test Title',
+            description='Test Description',
+            image_url=None
+        )
+        post_count_after = Post.objects.count()
+        self.assertEqual(post_count_after, post_count_before + 1)
 
-    def test_multiple_posts(self):
-        """Test for multiple posts"""
-        post1_data = {'title': 'Post 1', 'description': 'Description 1'}
-        post2_data = {'title': 'Post 2', 'description': 'Description 2'}
-        self.client.post('/api/posts/', post1_data, format='json')
-        self.client.post('/api/posts/', post2_data, format='json')
+    def test_image_resizing(self):
+        """Test for image resizing."""
+        test_image = self.create_test_image(size=(1000, 1000))
+        uploaded_file = SimpleUploadedFile(
+            name='test_large_image.jpg',
+            content=test_image.read(),
+            content_type='image/jpeg'
+        )
+        post = Post.objects.create(
+            title='Resize test post',
+            description='Description',
+            image_url=uploaded_file
+        )
+        post.refresh_from_db()
+        saved_image = Image.open(post.image_url.path)
 
-        response = self.client.get('/api/posts/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        # Check the resized dimensions; the model resizes to 800x800
+        self.assertEqual(saved_image.width, 800)
+        self.assertEqual(saved_image.height, 800)
 
-    def test_permission(self):
+        # Clean up temporary files
+        test_image.close()
+        os.remove(test_image.name)
+        saved_image.close()
+        os.remove(post.image_url.path)
 
-        #check on no admin users
-        no_admin = User.objects.create_user(username='user', password='testpassword')
-        self.client.login(username='user', password='passpass')
-        response = self.client.get('/api/posts')
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.post('/api/posts/', {'title': 'New Post', 'description': 'New Description'}, format='json')
-        self.assertEqual(response.status_code, )
